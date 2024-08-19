@@ -1,15 +1,16 @@
 import React from 'react';
-import ReactModal from 'react-modal';
+import Modal from 'react-modal';
 
-ReactModal.setAppElement('#root');
-
-const ImageModal = ({ image, alt, onClose }) => {
-  return (
-    <ReactModal isOpen onRequestClose={onClose} contentLabel="Image Modal">
-      <button onClick={onClose}>Close</button>
-      <img src={image} alt={alt} style={{ width: '100%' }} />
-    </ReactModal>
-  );
-};
+const ImageModal = ({ isOpen, onRequestClose, image }) => (
+  <Modal isOpen={isOpen} onRequestClose={onRequestClose}>
+    <div className="modal-content">
+      <img src={image.urls.regular} alt={image.alt_description} />
+      <p>{image.description || image.alt_description}</p>
+      <p>Author: {image.user.name}</p>
+      <p>Likes: {image.likes}</p>
+    </div>
+  </Modal>
+);
 
 export default ImageModal;
+

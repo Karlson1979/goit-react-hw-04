@@ -1,23 +1,10 @@
-import React, { useState } from 'react';
-import ImageModal from './ImageModal';
 
-const ImageCard = ({ image }) => {
-  const [isOpen, setIsOpen] = useState(false);
+import React from 'react';
 
+const ImageCard = ({ image, onClick }) => {
   return (
-    <div>
-      <img
-        src={image.urls.small}
-        alt={image.alt_description}
-        onClick={() => setIsOpen(true)}
-      />
-      {isOpen && (
-        <ImageModal
-          image={image.urls.regular}
-          alt={image.alt_description}
-          onClose={() => setIsOpen(false)}
-        />
-      )}
+    <div className="image-card" onClick={() => onClick(image)}>
+      <img src={image.urls.small} alt={image.alt_description} />
     </div>
   );
 };

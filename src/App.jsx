@@ -1,66 +1,77 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import toast, { Toaster } from 'react-hot-toast';
-import SearchBar from './components/SearchBar/SearchBar'
+import SearchBar from './components/SearchBar/SearchBar';
 import ImageGallery from './components/ImageGallery/ImageGallery';
 import Loader from './components/Loader/Loader';
 import ErrorMessage from './components/ErrorMessage/ErrorMessage';
 import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn';
+import ImageModal from './components/ImageModal/ImageModal';
+
+const UNSPLASH_ACCESS_KEY = 'w3RsBwLFw5aaN_KdIOBmOaPMpNDgV0OJkE9oIUEYyCE';
 
 const App = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  const accessKey = 'w3RsBwLFw5aaN_KdIOBmOaPMpNDgV0OJkE9oIUEYyCE';
-
-  const fetchImages = async (newQuery, newPage) => {
-    setLoading(true);
-    setError(null);
-
+  const fetchImages = async (query, page) => {
     try {
-      const response = await axios.get(
-        `https://api.unsplash.com/`,
-        {
-          params: {
-            client_id: accessKey,
-            query: newQuery,
-            page: newPage,
-            per_page: 12,
-          },
-        }
-      );
+      const response = await axios.get(`https://api.unsplash.com/search/photos`, {
+        params: {
+          query,
+          page,
+          per_page: 12,
+          client_id: UNSPLASH_ACCESS_KEY,
+        },
+      });
 
-      setImages((prevImages) =>
-        newPage === 1 ? response.data.results : [...prevImages, ...response.data.results]
-      );
-      setPage(newPage);
-    } catch (err) {
-      setError('Something went wrong. Please try again later.');
+      if (page === 1) {
+        setImages(response.data.results);
+      } else {
+        setImages((prevImages) => [...prevImages, ...response.data.results]);
+      }
+    } catch (error) {
+      setError('Failed to fetch images');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearch = (newQuery) => {
-    setQuery(newQuery);
-    fetchImages(newQuery, 1);
+  const handleSearch = (query) => {
+    setLoading(true);
+    setPage(1);
+    setError(null);
+    fetchImages(query, 1);
   };
 
   const handleLoadMore = () => {
+    setPage((prevPage) => prevPage + 1);
     fetchImages(query, page + 1);
   };
 
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedImage(null);
+  };
+
   return (
-    <div>
-      <Toaster position="top-right" />
+    <div className="App">
       <SearchBar onSubmit={handleSearch} />
-      {error && <ErrorMessage message={error} />}
-      <ImageGallery images={images} />
       {loading && <Loader />}
+      {error && <ErrorMessage message={error} />}
+      <ImageGallery images={images} onImageClick={handleImageClick} />
       {images.length > 0 && !loading && <LoadMoreBtn onClick={handleLoadMore} />}
+      {showModal && (
+        <ImageModal isOpen={showModal} onRequestClose={closeModal} image={selectedImage} />
+      )}
     </div>
   );
 };

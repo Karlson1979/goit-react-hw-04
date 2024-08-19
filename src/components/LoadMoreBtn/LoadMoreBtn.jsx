@@ -1,7 +1,7 @@
-import React from 'react';
-
 const LoadMoreBtn = ({ onClick }) => (
-  <button onClick={onClick}>Load more</button>
+  <button className="load-more-btn" onClick={onClick}>
+    Load more
+  </button>
 );
 
 export default LoadMoreBtn;
