@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast, Toaster } from 'react-hot-toast';
 
 const SearchBar = ({ onSubmit }) => {
   const [query, setQuery] = useState('');
@@ -10,7 +11,7 @@ const SearchBar = ({ onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim() === '') {
-      alert('Please enter a search query');
+      toast.error('Please enter a search query');
       return;
     }
     onSubmit(query);
@@ -30,6 +31,8 @@ const SearchBar = ({ onSubmit }) => {
         />
         <button type="submit">Search</button>
       </form>
+      
+      <Toaster />
     </header>
   );
 };
